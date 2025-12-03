@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial: Web Scraping con Python y Pandas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fira+Code&display=swap"
+        rel="stylesheet">
+</head>
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial: Web Scraping con Python y Pandas</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fira+Code&display=swap"
+        rel="stylesheet">
+</head>
+
+<section id="intro">
+    <h2>Introducción</h2>
+    <p>¡Bienvenido! La combinación de <strong>Pandas</strong> con <strong>Web Scraping</strong> es una de
+        las
+        habilidades más demandadas en ciencia de datos. Pandas es ideal para estructurar, limpiar y analizar
+        los
+        datos que obtienes de la web, convirtiendo información desordenada en conocimiento útil.</p>
+    <div class="note">
+        <p><strong>Nota Importante:</strong> Pandas no extrae datos por sí mismo. Su función comienza
+            <em>después</em> de que librerías como <strong>BeautifulSoup</strong> o <strong>Scrapy</strong>
+            han
+            hecho el trabajo sucio de descargar y parsear el HTML.
+        </p>
+    </div>
+    <p>En este tutorial profesional, aprenderás el flujo de trabajo completo:</p>
+    <ol>
+        <li><strong>Definición:</strong> Crear una lista de objetivos (URLs).</li>
+        <li><strong>Extracción:</strong> Descargar y parsear el HTML.</li>
+        <li><strong>Transformación:</strong> Almacenar en diccionarios Python.</li>
+        <li><strong>Carga y Análisis:</strong> Convertir a DataFrame de Pandas para su uso final.</li>
+    </ol>
+</section>
+
+<section id="prerequisites">
+    <h2>Requisitos Previos</h2>
+    <p>Para seguir este tutorial, necesitas instalar las siguientes librerías. Cada una tiene un propósito
+        específico:</p>
+    <ul>
+        <li><code>requests</code>: Actúa como tu navegador web, enviando solicitudes HTTP a los servidores
+            para
+            obtener el código fuente de las páginas.</li>
+        <li><code>beautifulsoup4</code>: Es el "traductor" que toma ese código HTML crudo y lo convierte en
+            una
+            estructura de árbol navegable para encontrar títulos, enlaces y textos fácilmente.</li>
+        <li><code>pandas</code>: La herramienta de análisis de datos por excelencia, usada para organizar la
+            información en tablas (DataFrames).</li>
+    </ul>
+    <pre><code>pip install requests beautifulsoup4 pandas</code></pre>
+</section>
+
+<!-- Ad Slot Middle 1 -->
+<div class="ad-slot">
+    <span>Anuncio Intermedio 1</span>
+</div>
+
+<section id="step1">
+    <h2>1. Definición de la Lista de Trabajo</h2>
+    <p>Todo proyecto de scraping comienza con un objetivo. En lugar de complicarnos con flujos de datos
+        complejos al principio, usaremos una lista simple de Python. Esta lista actúa como nuestra cola de
+        trabajo.</p>
+    <p>Imagina que esta lista proviene de una base de datos o de un archivo CSV que cargaste previamente.
+    </p>
+    <pre><code># Lista de URLs a procesar
+# En un caso real, esto podría venir de un archivo o base de datos
+urls_a_raspar = [
+    'https://example.com',
+    'https://www.python.org',
+    'https://www.google.com'
+]
+
+# Creamos una lista vacía para almacenar los datos extraídos
+# Aquí iremos guardando cada "fila" de nuestra futura tabla
+datos_extraidos = []</code></pre>
+</section>
+
+<section id="step2">
+    <h2>2. Extracción de Datos (Web Scraping)</h2>
+    <p>Este es el núcleo del proceso. Iteraremos sobre cada URL, haremos la petición y extraeremos lo que
+        necesitamos. Es crucial manejar los errores (como una página no encontrada 404) para que el script
+        no se
+        detenga a la mitad del proceso.</p>
+    <p>Observa cómo usamos <code>try-except</code> para asegurar la robustez del script.</p>
+    <pre><code>import requests
+from bs4 import BeautifulSoup
+
+def extraer_datos(url):
+    """
+    Extrae el título de la página y devuelve un diccionario.
+    Maneja errores de conexión y parseo.
+    """
+    try:
+        # 1. Petición a la URL (Simulamos ser un navegador)
+        respuesta = requests.get(url)
+        respuesta.raise_for_status() # Lanza un error si la web no carga (404, 500)
+
+        # 2. Analizar el HTML
+        sopa = BeautifulSoup(respuesta.text, 'html.parser')
+
+        # 3. Extraer el dato específico (Título)
+        if sopa.find('title'):
+            titulo = sopa.find('title').get_text(strip=True)
+        else:
+            titulo = 'SIN TÍTULO'
+
+        # 4. Retornar estructura limpia
+        return {'url': url, 'titulo': titulo}
+
+    except Exception as e:
+        print(f"Error al raspar {url}: {e}")
+        return {'url': url, 'titulo': 'ERROR DE EXTRACCIÓN'}
+
+# Ejecución del bucle principal
+print("Iniciando proceso de scraping...")
+for url in urls_a_raspar:
+    print(f"Procesando: {url}")
+    resultado = extraer_datos(url)
+    datos_extraidos.append(resultado)
+
+print(f"Proceso finalizado. {len(datos_extraidos)} registros obtenidos.")</code></pre>
+</section>
+
+<!-- Ad Slot Middle 2 -->
+<div class="ad-slot">
+    <span>Anuncio Intermedio 2</span>
+</div>
+
+<section id="step3">
+    <h2>3. Uso de Pandas para Estructurar y Analizar</h2>
+    <p>Aquí es donde Pandas brilla. Convertir una lista de diccionarios a un DataFrame es instantáneo y nos
+        da
+        acceso a cientos de herramientas de análisis.</p>
+    <p>Una vez en formato DataFrame, puedes filtrar errores, exportar a Excel/CSV, o conectar con
+        herramientas
+        de visualización.</p>
+    <pre><code>import pandas as pd
+
+# 1. Convertir la lista de diccionarios a un DataFrame
+df = pd.DataFrame(datos_extraidos)
+
+# 2. Visualizar los primeros resultados
+print("\nVista previa del DataFrame:")
+print(df.head())
+
+# 3. Análisis simple: Filtrar errores
+# Contamos cuántas URLs fueron exitosas
+exitosos = df[df['titulo'] != 'ERROR DE EXTRACCIÓN']
+print(f"\nURLs procesadas correctamente: {len(exitosos)} de {len(df)}")
+
+# 4. Exportación de resultados
+# index=False evita guardar el número de fila en el archivo
+df.to_csv('resultados_scrapping.csv', index=False, encoding='utf-8')
+print("\n¡Éxito! Datos guardados en 'resultados_scrapping.csv'")</code></pre>
+</section>
+
+<section id="summary">
+    <h2>Resumen del Flujo Profesional</h2>
+    <ul>
+        <li><strong>Input:</strong> Definimos la lista de URLs (nuestra materia prima).</li>
+        <li><strong>Scraping:</strong> Usamos <code>requests</code> para descargar y
+            <code>BeautifulSoup</code>
+            para minar los datos.
+        </li>
+        <li><strong>Estructura:</strong> Los datos se organizan temporalmente en diccionarios.</li>
+        <li><strong>Pandas:</strong> Transformamos los datos en un DataFrame para limpieza final, análisis y
+            exportación.</li>
+    </ul>
+</section>
+
+<!-- Ad Slot Bottom -->
+<div class="ad-slot">
+    <span>Anuncio Inferior</span>
+</div>
+</main>
+
+<aside>
+    <div class="ad-slot" style="height: 600px;">
+        <span>Anuncio Lateral (Vertical)</span>
+    </div>
+</aside>
+</div>
+
+<footer>
+    <p>Tutorial generado por Antigravity</p>
+</footer>
+</body>
+
+</html>
