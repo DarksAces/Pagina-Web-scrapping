@@ -36,28 +36,38 @@ def extraer_datos(url):
         return {'url': url, 'titulo': 'ERROR DE EXTRACCIÓN'}
 
 # Iterar sobre la lista de URLs y llenar la lista 'datos_extraidos'
-print("Iniciando extracción...")
-for url in urls_a_raspar:
-    print(f"Procesando: {url}")
-    resultado = extraer_datos(url)
-    datos_extraidos.append(resultado)
+# Iterar sobre la lista de URLs y llenar la lista 'datos_extraidos'
+def ejecutar_scraping():
+    print("Iniciando extracción...")
+    datos_locales = []
+    for url in urls_a_raspar:
+        print(f"Procesando: {url}")
+        resultado = extraer_datos(url)
+        datos_locales.append(resultado)
 
-print("Extracción completa. Datos recolectados:")
-print(datos_extraidos)
+    print("Extracción completa. Datos recolectados:")
+    print(datos_locales)
 
-# Convertir la lista de diccionarios a un DataFrame de Pandas
-df = pd.DataFrame(datos_extraidos)
+    # Convertir la lista de diccionarios a un DataFrame de Pandas
+    df = pd.DataFrame(datos_locales)
 
-# Mostrar el DataFrame
-print("\nDataFrame de Pandas:")
-print(df)
+    # Mostrar el DataFrame
+    print("\nDataFrame de Pandas:")
+    print(df)
 
-# Ejemplo de análisis o manipulación con Pandas:
-# Contar cuántas filas se extrajeron sin errores
-filas_exitosas = df[df['titulo'] != 'ERROR DE EXTRACCIÓN'].shape[0]
+    # Ejemplo de análisis o manipulación con Pandas:
+    # Contar cuántas filas se extrajeron sin errores
+    if 'titulo' in df.columns:
+        filas_exitosas = df[df['titulo'] != 'ERROR DE EXTRACCIÓN'].shape[0]
+    else:
+        filas_exitosas = 0
 
-print(f"\nNúmero de filas extraídas con éxito: {filas_exitosas}")
+    print(f"\nNúmero de filas extraídas con éxito: {filas_exitosas}")
 
-# Exportar los resultados a un archivo CSV
-df.to_csv('resultados_scrapping.csv', index=False, encoding='utf-8')
-print("\nDatos exportados a 'resultados_scrapping.csv'")
+    # Exportar los resultados a un archivo CSV
+    df.to_csv('resultados_scrapping.csv', index=False, encoding='utf-8')
+    print("\nDatos exportados a 'resultados_scrapping.csv'")
+    return datos_locales
+
+if __name__ == "__main__":
+    ejecutar_scraping()
