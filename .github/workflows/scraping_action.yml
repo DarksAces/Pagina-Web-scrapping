@@ -1,0 +1,54 @@
+name: Ejecutar Scraping Diario y Actualizar Datos
+
+# 1. Definición de la Programación
+# Ejecuta el workflow todos los días a las 08:00 (hora UTC).
+# La hora exacta puede variar un poco.
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  # Permite ejecutar manualmente el workflow desde la pestaña "Actions" de GitHub
+  workflow_dispatch: 
+
+jobs:
+  scrape_and_commit:
+    runs-on: ubuntu-latest # Usa un entorno Linux estándar de GitHub
+
+    steps:
+      # Paso 1: Descargar el código (necesario para trabajar en él)
+      - name: Checkout del Repositorio
+        uses: actions/checkout@v4
+        with:
+          # Es crucial para que el workflow pueda hacer 'git push' de vuelta
+          token: ${{ secrets.GITHUB_TOKEN }} 
+
+      # Paso 2: Configurar Python e instalar dependencias
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Instalar Dependencias
+        # Instala requests, beautifulsoup4 y pandas desde requirements.txt
+        run: pip install -r requirements.txt 
+
+      # Paso 3: Ejecutar el script (Genera el nuevo 'resultados_scrapping.csv')
+      - name: Ejecutar Script de Scraping
+        # Llama a tu script de Python, el cual actualizará el CSV
+        run: python scraping_tutorial.py
+        
+      # Paso 4: Configurar la identidad de Git para el commit automático
+      - name: Configurar Git
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          
+      # Paso 5: Subir el archivo CSV actualizado (el commit automático)
+      - name: Subir el CSV Actualizado
+        run: |
+          # Añade el archivo CSV modificado
+          git add resultados_scrapping.csv
+          
+          # Solo hace commit si el archivo ha cambiado
+          git diff --quiet && git diff --staged --quiet || git commit -m "Actualización automática de datos de scraping [Automated]"
+          
+          # Sube el cambio a la rama principal (main)
+          git push
