@@ -9,9 +9,6 @@ urls_a_raspar = [
     'https://www.google.com'
 ]
 
-# Creamos una lista vacía para almacenar los datos extraídos
-datos_extraidos = []
-
 def extraer_datos(url):
     """Extrae el título de la página y devuelve un diccionario."""
     try:
@@ -35,8 +32,6 @@ def extraer_datos(url):
         print(f"Error al raspar {url}: {e}")
         return {'url': url, 'titulo': 'ERROR DE EXTRACCIÓN'}
 
-# Iterar sobre la lista de URLs y llenar la lista 'datos_extraidos'
-# Iterar sobre la lista de URLs y llenar la lista 'datos_extraidos'
 def ejecutar_scraping():
     print("Iniciando extracción...")
     datos_locales = []
@@ -46,28 +41,16 @@ def ejecutar_scraping():
         datos_locales.append(resultado)
 
     print("Extracción completa. Datos recolectados:")
-    print(datos_locales)
 
     # Convertir la lista de diccionarios a un DataFrame de Pandas
     df = pd.DataFrame(datos_locales)
 
-    # Mostrar el DataFrame
-    print("\nDataFrame de Pandas:")
-    print(df)
-
-    # Ejemplo de análisis o manipulación con Pandas:
-    # Contar cuántas filas se extrajeron sin errores
-    if 'titulo' in df.columns:
-        filas_exitosas = df[df['titulo'] != 'ERROR DE EXTRACCIÓN'].shape[0]
-    else:
-        filas_exitosas = 0
-
-    print(f"\nNúmero de filas extraídas con éxito: {filas_exitosas}")
-
     # Exportar los resultados a un archivo CSV
+    # ESTO ES CRUCIAL: El script de Actions subirá este archivo actualizado.
     df.to_csv('resultados_scrapping.csv', index=False, encoding='utf-8')
     print("\nDatos exportados a 'resultados_scrapping.csv'")
     return datos_locales
 
+# Asegura que el scraping se ejecute automáticamente cuando GitHub Actions llama al script
 if __name__ == "__main__":
     ejecutar_scraping()
